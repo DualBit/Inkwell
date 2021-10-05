@@ -65,8 +65,6 @@ final class GoogleFontsMetadata {
         let destination: DownloadRequest.Destination = { _, _ in
             return (self.storage.metadataURL, [.removePreviousFile, .createIntermediateDirectories])
         }
-        
-        
 
         return AF.download(APIEndpoint,
                                   method: .get,
@@ -77,16 +75,17 @@ final class GoogleFontsMetadata {
             .validate(statusCode: 200..<300)
             .validate(contentType: ["application/json"])
             .responseJSON(queue: queue ?? DispatchQueue.main, options: .allowFragments) { response in
-                let familyResponse = response.flatMap { json -> FamilyDictionary in
+                let familyResponse = response.response.flatMap { json -> FamilyDictionary in
                     guard let json = json as? JSON else { return [:] }
 
                     return self.parse(json: json, variantFilter: self.defaultVariantFilter)
                 }
 
-                switch familyResponse.result {
+                switch response.result {
                 case .success(let value):
-                    self.cache = value
-                    completion(.success(value))
+                    break
+//                    self.cache = value
+//                    completion(.success(value))
                 case .failure(let error):
                     self.storage.removeGoogleFontsMetadata()
                     completion(.failure(error))
