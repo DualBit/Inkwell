@@ -122,7 +122,7 @@ final class GoogleFontsMetadata {
         let familyDictionary = cache ?? familyDictionary ?? self.familyDictionary()
 
         guard let files = familyDictionary[font.family],
-            let index = files.index(where: { $0.hasSuffix(font.variant.rawValue) }) else {
+              let index = files.firstIndex(where: { $0.hasSuffix(font.variant.rawValue) }) else {
                 return nil
         }
 
@@ -159,7 +159,7 @@ final class GoogleFontsMetadata {
 
             var result = result
 
-            result[family] = files.flatMap { (key, value) in
+            result[family] = files.compactMap { (key, value) in
                 guard variantFilter(key),
                     var urlComponents = URLComponents(string: value) else { return nil }
 
