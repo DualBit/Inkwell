@@ -59,11 +59,16 @@ final class GoogleFontsMetadata {
     /// - Parameter completion: The completion handler.
     /// - Returns: The download request.
     func fetch(completion: @escaping (Result<FamilyDictionary>) -> Void) -> DownloadRequest {
-        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+        
+        
+        
+        let destination: DownloadRequest.Destination = { _, _ in
             return (self.storage.metadataURL, [.removePreviousFile, .createIntermediateDirectories])
         }
+        
+        
 
-        return Alamofire.download(APIEndpoint,
+        return AF.download(APIEndpoint,
                                   method: .get,
                                   parameters: ["key": APIKey],
                                   encoding: URLEncoding.queryString,
@@ -71,7 +76,7 @@ final class GoogleFontsMetadata {
                                   to: destination)
             .validate(statusCode: 200..<300)
             .validate(contentType: ["application/json"])
-            .responseJSON(queue: queue, options: .allowFragments) { response in
+            .responseJSON(queue: queue ?? DispatchQueue.main, options: .allowFragments) { response in
                 let familyResponse = response.flatMap { json -> FamilyDictionary in
                     guard let json = json as? JSON else { return [:] }
 

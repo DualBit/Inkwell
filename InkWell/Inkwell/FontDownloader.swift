@@ -44,12 +44,12 @@ final class FontDownloader {
     /// - Returns: The download request.
     func download(_ font: Font, at URL: URL, completion: @escaping (Result<URL>) -> Void) -> DownloadRequest {
         let storageURL = storage.URL(for: font)
-        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+        let destination: DownloadRequest.Destination = { _, _ in
             return (storageURL, [.removePreviousFile, .createIntermediateDirectories])
         }
 
-        return Alamofire.download(URL, to: destination)
-            .response(queue: queue) { response in
+        return AF.download(URL, to: destination)
+            .response(queue: queue ?? DispatchQueue.main) { response in
                 if let error = response.error {
                     completion(.failure(error))
                 } else {
